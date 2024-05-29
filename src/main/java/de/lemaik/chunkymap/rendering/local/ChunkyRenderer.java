@@ -8,6 +8,8 @@ import de.lemaik.chunkymap.rendering.RenderException;
 import de.lemaik.chunkymap.rendering.Renderer;
 import de.lemaik.chunkymap.rendering.SilentTaskTracker;
 import net.time4tea.oidn.OidnImages;
+import org.dynmap.hdmap.TexturePack;
+import org.w3c.dom.Text;
 import se.llbit.chunky.PersistentSettings;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.renderer.RenderManager;
@@ -16,7 +18,9 @@ import se.llbit.chunky.renderer.scene.PathTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
 import se.llbit.chunky.resources.BitmapImage;
+import se.llbit.chunky.resources.Texture;
 import se.llbit.chunky.resources.TexturePackLoader;
+import se.llbit.chunky.resources.texturepack.TextureLoader;
 import se.llbit.util.TaskTracker;
 
 import java.awt.*;
@@ -93,8 +97,15 @@ public class ChunkyRenderer implements Renderer {
 
     String texturepackPaths = this.getTexturepackPaths(texturepacks);
     if (!texturepackPaths.equals(previousTexturepacks)) {
-      TexturePackLoader.loadTexturePacks(texturepackPaths, false);
-      previousTexturepacks = texturepackPaths;
+      try {
+        File rpath = new File(texturepackPaths);
+        for (TextureLoader texture :TexturePackLoader.ALL_TEXTURES.values()) {
+          texture.loadFromFile(rpath);
+        }
+        previousTexturepacks = texturepackPaths;
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
 
     context.setRenderThreadCount(threads);
@@ -158,11 +169,11 @@ public class ChunkyRenderer implements Renderer {
       */
 
       BufferedImage renderedImage = OidnImages.Companion
-          .newBufferedImage(scene.width, scene.height);
+          .newBufferedImage(scene.canvasConfig.getWidth(), scene.canvasConfig.getHeight());
       for (int i = 0; i < samples.length; i++) {
         renderedImage.getRaster().getDataBuffer().setElemDouble(i, samples[i]);
       }
-      BufferedImage imageInIntPixelLayout = new BufferedImage(scene.width, scene.height,
+      BufferedImage imageInIntPixelLayout = new BufferedImage(scene.canvasConfig.getWidth(), scene.canvasConfig.getHeight(),
           BufferedImage.TYPE_INT_ARGB);
       Graphics2D graphics = imageInIntPixelLayout.createGraphics();
       graphics.drawImage(renderedImage, 0, 0, null);
