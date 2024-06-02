@@ -103,16 +103,17 @@ public class ChunkyRenderer implements Renderer {
       Consumer<Scene> initializeScene) {
     CompletableFuture<BufferedImage> result = new CompletableFuture<>();
 
-    String texturepackPaths = this.getTexturepackPaths(texturepacks);
-    if (!texturepackPaths.equals(previousTexturepacks)) {
-      try {
-        // Eghum
-        ResourcePackLoader.loadResourcePacks(Arrays.asList(texturepacks));
-        previousTexturepacks = texturepackPaths; // issue
-      } catch (Exception e) {
-        e.printStackTrace();
+      if (!Arrays.toString(texturepacks).equals(previousTexturepacks)) {
+        synchronized(texturepacks) {
+          try {
+            // Eghum
+            ResourcePackLoader.loadResourcePacks(Arrays.asList(texturepacks));
+            previousTexturepacks = Arrays.toString(texturepacks); // issue
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
       }
-    }
 
     context.setRenderThreadCount(threads);
     RenderManager renderManager = context.getChunky().getRenderController().getRenderManager();
