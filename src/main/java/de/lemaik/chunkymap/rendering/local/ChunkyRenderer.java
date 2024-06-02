@@ -11,24 +11,32 @@ import net.time4tea.oidn.OidnImages;
 import org.dynmap.hdmap.TexturePack;
 import org.w3c.dom.Text;
 import se.llbit.chunky.PersistentSettings;
+import se.llbit.chunky.block.TexturedBlock;
 import se.llbit.chunky.main.Chunky;
 import se.llbit.chunky.renderer.RenderManager;
 import se.llbit.chunky.renderer.SnapshotControl;
 import se.llbit.chunky.renderer.scene.PathTracer;
 import se.llbit.chunky.renderer.scene.Scene;
 import se.llbit.chunky.renderer.scene.SynchronousSceneManager;
-import se.llbit.chunky.resources.BitmapImage;
-import se.llbit.chunky.resources.Texture;
-import se.llbit.chunky.resources.TexturePackLoader;
+import se.llbit.chunky.resources.*;
+import se.llbit.chunky.resources.texturepack.AllTextures;
+import se.llbit.chunky.resources.texturepack.TextureFormatError;
 import se.llbit.chunky.resources.texturepack.TextureLoader;
+import se.llbit.chunky.resources.texturepack.TexturePath;
 import se.llbit.util.TaskTracker;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -98,11 +106,9 @@ public class ChunkyRenderer implements Renderer {
     String texturepackPaths = this.getTexturepackPaths(texturepacks);
     if (!texturepackPaths.equals(previousTexturepacks)) {
       try {
-        File rpath = new File(texturepackPaths);
-        for (TextureLoader texture :TexturePackLoader.ALL_TEXTURES.values()) {
-          texture.loadFromFile(rpath);
-        }
-        previousTexturepacks = texturepackPaths;
+        // Eghum
+        ResourcePackLoader.loadResourcePacks(Arrays.asList(texturepacks));
+        previousTexturepacks = texturepackPaths; // issue
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -182,10 +188,10 @@ public class ChunkyRenderer implements Renderer {
       return imageInIntPixelLayout;
     } else {
       Class<Scene> sceneClass = Scene.class;
-      Method computeAlpha = sceneClass
-          .getDeclaredMethod("computeAlpha", new Class[]{TaskTracker.class});
-      computeAlpha.setAccessible(true);
-      computeAlpha.invoke(scene, SilentTaskTracker.INSTANCE);
+//      Method computeAlpha = sceneClass
+//          .getDeclaredMethod("computeAlpha", new Class[]{TaskTracker.class});
+//      computeAlpha.setAccessible(true);
+//      computeAlpha.invoke(scene, SilentTaskTracker.INSTANCE);
 
       Field finalized = sceneClass.getDeclaredField("finalized");
       finalized.setAccessible(true);

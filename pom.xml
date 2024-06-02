@@ -17,7 +17,8 @@
     <jdk.version>1.8</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <chunky.version>2.4.4-20221023.020557-1</chunky.version><!-- 2.4.4 but without biome warnings -->
+    <chunky.version>2.5.0-SNAPSHOT</chunky.version><!-- 2.4.4 but without biome warnings -->
+    <!-- 2.4.4-20221023.020557-1 -->
   </properties>
 
   <repositories>
@@ -90,7 +91,8 @@
     <dependency>
       <groupId>de.lemaik</groupId>
       <artifactId>chunky-denoiser</artifactId>
-      <version>0.5.0</version>
+      <version>0.5.1</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 
@@ -123,6 +125,27 @@
           </descriptorRefs>
         </configuration>
       </plugin>
+      <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-install-plugin</artifactId>
+      <version>2.5.2</version>
+      <executions>
+        <execution>
+          <phase>initialize</phase>
+          <goals>
+            <goal>install-file</goal>
+          </goals>
+          <configuration>
+            <!--  de/lemaik/chunky/denoiser/Denoiser -->
+            <file>chunky-denoiser.jar</file>
+            <groupId>de.lemaik</groupId>
+            <artifactId>chunky-denoiser</artifactId>
+            <version>0.5.1</version>
+            <packaging>jar</packaging>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
     </plugins>
     <resources>
       <resource>
